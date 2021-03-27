@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "나는 천재다",
+    "name": "열 고개",
     "slug": "guessing_your_number",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Circle_sign_1000.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -13,17 +13,18 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.dreamystar.tenquestions",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Circle_sign_1000.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.dreamystar.tenquestions"
     },
     "web": {
       "favicon": "./assets/favicon.png"
