@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "열 고개",
-    "slug": "guessing_your_number",
-    "version": "1.0.0",
+    "slug": "tenquestions",
+    "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/Circle_sign_1000.png",
+    "icon": "./assets/1000.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFFFF"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -16,12 +16,12 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.dreamystar.tenquestions",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.1.0",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Circle_sign_1000.png",
+        "foregroundImage": "./assets/1000_adaptive.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.dreamystar.tenquestions"
