@@ -20,25 +20,23 @@ const soundFailed = new Audio.Sound();
 
 var pressed = false,
   thinkEnd = true;
-
 var answerStart = false,
-  answerEnd = false,
-  answerYes = false,
-  answerNo = false,
-  answerBack = false;
-
-var Qnum = 0,
-  left = 1,
-  mid = 500,
-  right = 1000;
-
-var backUp = [];
-var askIsThat = false;
+  answerEnd = false;
+var answerYes = false,
+  answerNo = false;
 var figureOut = false;
+
+var answerBack = false;
+var backUp = [];
 
 export default class extends React.Component {
   state = {
     GameState: "Start",
+    askIsThat: false,
+    Qnum: 0,
+    left: 1,
+    mid: 500,
+    right: 1000,
   };
 
   loadSound_PlayBGM = async () => {
@@ -63,13 +61,16 @@ export default class extends React.Component {
   };
 
   gameReset() {
+    backUp = [];
     this.stopSound(soundFigureOut);
     this.replaySound(soundBGM);
-    backUp = [];
     figureOut = false;
-    (Qnum = 0), (left = 1), (mid = 500), (right = 1000); //// 1001 X
     this.setState({
       GameState: "Start",
+      Qnum: 0,
+      left: 1,
+      mid: 500,
+      right: 1000, //// 1001 X
     });
   }
 
@@ -79,11 +80,11 @@ export default class extends React.Component {
   }
 
   ask() {
-    //// mid == right - 1 || && mid == left + 1
-    if (right - left <= 2) {
-      askIsThat = true;
+    //// this.state.mid == this.state.right - 1 || && this.state.mid == this.state.left + 1
+    if (this.state.right - this.state.left <= 2) {
+      this.state.askIsThat = true;
     } else {
-      askIsThat = false;
+      this.state.askIsThat = false;
     }
     this.setState({
       GameState: "Ask",
@@ -91,40 +92,42 @@ export default class extends React.Component {
   }
 
   think(YorN) {
-    Qnum++;
+    this.state.Qnum++;
     backUp.push({
-      left: left,
-      mid: mid,
-      right: right,
+      left: this.state.left,
+      mid: this.state.mid,
+      right: this.state.right,
     });
-
-    switch (askIsThat) {
-      case true:
-        switch (YorN) {
-          case true:
-            figureOut = true;
-            break;
-          case false:
-            right = mid;
-            mid = right - 1;
-        }
-        break; //// break를 쓰면 오류가 안 난다
-      case false:
-        switch (YorN) {
-          case true:
-            right = mid;
-            mid = right - parseInt((right - left + 1) / 2);
-            break;
-          case false:
-            left = mid;
-            mid = left + parseInt((right - left + 1) / 2);
-        }
+    if (YorN) {
+      if (this.state.askIsThat) {
+        figureOut = true;
+      } else {
+        this.state.right = this.state.mid;
+        this.state.mid =
+          this.state.right -
+          parseInt((this.state.right - this.state.left + 1) / 2);
+      }
+    } else {
+      if (this.state.askIsThat) {
+        this.state.right = this.state.mid;
+        this.state.mid =
+          this.state.right -
+          parseInt((this.state.right - this.state.left + 1) / 2);
+      } else {
+        this.state.left = this.state.mid;
+        this.state.mid =
+          this.state.left +
+          parseInt((this.state.right - this.state.left + 1) / 2);
+      }
     }
     //// 질문 10번이 끝나면 무조건 답을 찾아내게 되있는데, 이것이냐고 콕 집어 물어보는 질문에 아니라고 답하면 답을 구한 줄 모름
     //// 남은 숫자가 하나인데도 답을 못 찾는 경우가 있음
-    right - left == 1 || Qnum == 10 ? (figureOut = true) : {}; ////
+    this.state.right - this.state.left == 1 || this.state.Qnum == 10
+      ? (figureOut = true)
+      : {}; ////
     answerYes = false;
     answerNo = false;
+    thinkEnd = true;
   }
 
   back() {
@@ -133,16 +136,16 @@ export default class extends React.Component {
       this.replaySound(soundBGM);
       figureOut = false;
     }
-    if (Qnum == 0) {
+    if (this.state.Qnum == 0) {
       this.setState({
         GameState: "Start",
       });
-    } else if (backUp.length == Qnum) {
-      Qnum--;
-      left = backUp[Qnum].left;
-      mid = backUp[Qnum].mid;
-      right = backUp[Qnum].right;
-      // backUp = backUp.slice(0, Qnum)
+    } else if (backUp.length == this.state.Qnum) {
+      // backUp = backUp.slice(0, this.state.Qnum)
+      this.state.Qnum--;
+      this.state.left = backUp[this.state.Qnum].left;
+      this.state.mid = backUp[this.state.Qnum].mid;
+      this.state.right = backUp[this.state.Qnum].right;
       backUp.pop(); /// backUp = backUp.pop() X
       this.ask();
     } else {
@@ -156,27 +159,32 @@ export default class extends React.Component {
   Questions_10() {
     pressed = false;
 
+    // 시작 또는 끝내기, 뒤로가기 버튼 눌렀을 때
+    if (answerStart) {
+      this.replaySound(soundAnswer);
+      this.ask();
+      answerStart = false;
+      return;
+    } else if (answerEnd) {
+      this.replaySound(soundEnd);
+      this.gameReset();
+      answerEnd = false;
+      return;
+    } else if (answerBack) {
+      this.replaySound(soundBack);
+      this.back();
+      answerBack = false;
+      return;
+    }
+
     // 생각 중 화면 띄우기
     thinkEnd = false;
     this.setState({
       GameState: "Think",
     });
 
-    // 시작 또는 끝내기, 뒤로가기 버튼 눌렀을 때
-    if (answerStart) {
-      answerStart = false;
-      this.replaySound(soundAnswer);
-      this.ask();
-    } else if (answerEnd) {
-      answerEnd = false;
-      this.replaySound(soundEnd);
-      this.gameReset();
-    } else if (answerBack) {
-      answerBack = false;
-      this.replaySound(soundBack);
-      this.back();
-    } else if (Qnum < 10 && (answerYes || answerNo)) {
-      // 열 고개 대답을 받았을 때
+    // 열 고개 대답을 받았을 때
+    if (this.state.Qnum < 10 && (answerYes || answerNo)) {
       this.replaySound(soundAnswer);
       if (answerYes) {
         this.think(true);
@@ -185,7 +193,7 @@ export default class extends React.Component {
       }
 
       // 답을 아직 모를 때, 알아냈을 때, 10고개 다 써도 답을 알아내지 못했을 때
-      if (figureOut == false && Qnum < 10) {
+      if (figureOut == false && this.state.Qnum < 10) {
         this.ask();
       } else if (figureOut) {
         this.stopSound(soundBGM);
@@ -203,29 +211,39 @@ export default class extends React.Component {
       }
     } else {
       Alert.alert("에러2...", "처음으로 돌아간다");
+      this.setState({
+        GameState: "Think",
+      });
     }
-    thinkEnd = true;
   }
 
   componentDidMount() {
-    setInterval(() => (pressed && thinkEnd ? this.Questions_10() : {}), 100);
-  } // 0.1초(100ms) 마다 반복
+    setInterval(() => (pressed && thinkEnd ? this.Questions_10() : {}), 100); // 0.1초(100ms) 마다 반복
+  }
 
   render() {
-    const { GameState } = this.state;
+    const { left, right, GameState, askIsThat, Qnum, mid } = this.state;
     switch (GameState) {
       case "Start":
         return <StartPage />;
       case "Ask":
-        return <QuestionPage />;
+        return (
+          <QuestionPage
+            left={left}
+            right={right}
+            mid={mid}
+            askIsThat={askIsThat}
+            Qnum={Qnum}
+          />
+        );
       case "Think":
-        return <ThinkingPage />;
+        return <ThinkingPage mid={mid} askIsThat={askIsThat} Qnum={Qnum} />;
       case "End":
-        return <AnswerPage />;
+        return <AnswerPage mid={mid} Qnum={Qnum} />;
       // case "Failed":
       //   return <FailedPage Qnum={Qnum} />;
       default:
-        Alert.alert("에러3...", "처음으로 돌아가라");
+        Alert.alert("에러3...", "처음으로 돌아간다");
         return <ThinkingPage />;
     }
   }
@@ -267,7 +285,7 @@ function StartPage() {
   );
 }
 
-function QuestionPage() {
+function QuestionPage({ left, right, mid, askIsThat, Qnum }) {
   function PressYes() {
     pressed = true;
     answerYes = true;
@@ -356,7 +374,7 @@ function QuestionPage() {
   );
 }
 
-function ThinkingPage() {
+function ThinkingPage({ mid, askIsThat, Qnum }) {
   function askText({ mid, askIsThat }) {
     switch (askIsThat) {
       case true:
@@ -405,7 +423,7 @@ function ThinkingPage() {
   );
 }
 
-function AnswerPage() {
+function AnswerPage({ mid, Qnum }) {
   function PressYes() {
     pressed = true;
     answerEnd = true;
