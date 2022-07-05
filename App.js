@@ -42,11 +42,11 @@ export default class extends React.Component {
   };
 
   loadSound_PlayBGM = async () => {
-    await soundBGM.loadAsync(require("./assets/Sunfl - Doll.mp3"));
+    await soundBGM.loadAsync(require("./assets/Sunfl-Doll.mp3"));
     await soundBGM.setIsLoopingAsync(true);
     await soundFigureOut.loadAsync(require("./assets/[효과음]축복.mp3"));
     await soundFigureOut.setIsLoopingAsync(true);
-    await soundEnd.loadAsync(require("./assets/무한도전 효과음(1).mp3"));
+    await soundEnd.loadAsync(require("./assets/무한도전_효과음(1).mp3"));
     await soundAnswer.loadAsync(require("./assets/클릭음27.mp3"));
     await soundBack.loadAsync(require("./assets/클릭음13.mp3"));
     await soundFailed.loadAsync(require("./assets/[효과음]Bounce.mp3"));
