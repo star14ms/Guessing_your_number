@@ -11,12 +11,8 @@ import {
   Alert,
 } from "react-native";
 
-const soundBGM = new Audio.Sound();
-const soundFigureOut = new Audio.Sound();
-const soundEnd = new Audio.Sound();
-const soundAnswer = new Audio.Sound();
-const soundBack = new Audio.Sound();
-const soundFailed = new Audio.Sound();
+import Sounds from "./sound"
+
 
 var pressed = false,
   thinkEnd = true;
@@ -41,30 +37,9 @@ export default class extends React.Component {
     GameState: "Start",
   };
 
-  loadSound_PlayBGM = async () => {
-    await soundBGM.loadAsync(require("./assets/Sunfl-Doll.mp3"));
-    await soundBGM.setIsLoopingAsync(true);
-    await soundFigureOut.loadAsync(require("./assets/[효과음]축복.mp3"));
-    await soundFigureOut.setIsLoopingAsync(true);
-    await soundEnd.loadAsync(require("./assets/무한도전_효과음(1).mp3"));
-    await soundAnswer.loadAsync(require("./assets/클릭음27.mp3"));
-    await soundBack.loadAsync(require("./assets/클릭음13.mp3"));
-    await soundFailed.loadAsync(require("./assets/[효과음]Bounce.mp3"));
-    await soundBGM.playAsync();
-  };
-  playSound = async (sound) => {
-    await sound.playAsync();
-  };
-  replaySound = async (sound) => {
-    sound.replayAsync();
-  };
-  stopSound = async (sound) => {
-    await sound.stopAsync();
-  };
-
   gameReset() {
-    this.stopSound(soundFigureOut);
-    this.replaySound(soundBGM);
+    this.sounds.stop("FigureOut");
+    this.sounds.play("BGM");
     backUp = [];
     figureOut = false;
     (Qnum = 0), (left = 1), (mid = 500), (right = 1000); //// 1001 X
@@ -75,7 +50,7 @@ export default class extends React.Component {
 
   constructor() {
     super();
-    this.loadSound_PlayBGM();
+    this.sounds = new Sounds()
   }
 
   ask() {
@@ -129,8 +104,8 @@ export default class extends React.Component {
 
   back() {
     if (figureOut) {
-      this.stopSound(soundFigureOut);
-      this.replaySound(soundBGM);
+      this.sounds.stop("FigureOut");
+      this.sounds.play("BGM");
       figureOut = false;
     }
     if (Qnum == 0) {
@@ -165,19 +140,19 @@ export default class extends React.Component {
     // 시작 또는 끝내기, 뒤로가기 버튼 눌렀을 때
     if (answerStart) {
       answerStart = false;
-      this.replaySound(soundAnswer);
+      this.sounds.play("Answer");
       this.ask();
     } else if (answerEnd) {
       answerEnd = false;
-      this.replaySound(soundEnd);
+      this.sounds.play("End");
       this.gameReset();
     } else if (answerBack) {
       answerBack = false;
-      this.replaySound(soundBack);
+      this.sounds.play("Back");
       this.back();
     } else if (Qnum < 10 && (answerYes || answerNo)) {
       // 열 고개 대답을 받았을 때
-      this.replaySound(soundAnswer);
+      this.sounds.play("Answer");
       if (answerYes) {
         this.think(true);
       } else if (answerNo) {
@@ -188,14 +163,14 @@ export default class extends React.Component {
       if (figureOut == false && Qnum < 10) {
         this.ask();
       } else if (figureOut) {
-        this.stopSound(soundBGM);
-        this.replaySound(soundFigureOut);
+        this.sounds.stop("BGM");
+        this.sounds.play("FigureOut");
         this.setState({
           askIsThat: false,
           GameState: "End",
         });
         // } else {
-        //   this.replaySound(soundFailed);
+        //   this.sounds.play("Failed");
         //   this.setState({
         //     askIsThat: false,
         //     GameState: "Failed",
