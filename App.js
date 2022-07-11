@@ -89,6 +89,9 @@ export default class extends React.Component {
           case true:
             right = mid;
             mid = right - parseInt((right - left + 1) / 2);
+            if (left == mid) {
+              figureOut = true
+            }
             break;
           case false:
             left = mid;
@@ -97,7 +100,7 @@ export default class extends React.Component {
     }
     //// 질문 10번이 끝나면 무조건 답을 찾아내게 되있는데, 이것이냐고 콕 집어 물어보는 질문에 아니라고 답하면 답을 구한 줄 모름
     //// 남은 숫자가 하나인데도 답을 못 찾는 경우가 있음
-    right - left == 1 || Qnum == 10 ? (figureOut = true) : {}; ////
+    right - left + 1 == 1 || Qnum == 10 ? (figureOut = true) : {}; ////
     answerYes = false;
     answerNo = false;
   }
